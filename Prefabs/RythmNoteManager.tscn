@@ -1,0 +1,94 @@
+[gd_scene load_steps=9 format=3 uid="uid://dj381yyfj4p2p"]
+
+[ext_resource type="Script" path="res://Scripts/RythmNoteManagerMainScript.gd" id="1_0atj1"]
+[ext_resource type="Script" path="res://Scripts/Beat Manager.gd" id="1_dvb48"]
+[ext_resource type="Script" path="res://Scripts/TargetPoint.gd" id="4_0jel4"]
+[ext_resource type="PackedScene" uid="uid://cxqk7ndkegptl" path="res://Prefabs/BeatTemplatePrefab.tscn" id="4_0l1si"]
+[ext_resource type="AudioStream" uid="uid://chbq0e0ct46oy" path="res://Beats/Missed Beat.wav" id="4_hly08"]
+[ext_resource type="AudioStream" uid="uid://bni7fyhhfoapc" path="res://Beats/Hit Beat.wav" id="5_typhi"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_kbmac"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_q1od0"]
+size = Vector2(10, 40)
+
+[node name="Rythm Path" type="Node2D" node_paths=PackedStringArray("movingbeatsNode", "TargetBox")]
+script = ExtResource("1_0atj1")
+movingbeatsNode = NodePath("Moving Beats")
+TargetBox = NodePath("TargetPoint/Hitbox")
+
+[node name="Spawn Point" type="Node2D" parent="."]
+position = Vector2(0, 500)
+
+[node name="Delete Point" type="Node2D" parent="."]
+position = Vector2(0, -20)
+
+[node name="Area2D" type="Area2D" parent="Delete Point"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Delete Point/Area2D"]
+shape = SubResource("RectangleShape2D_kbmac")
+
+[node name="Moving Beats" type="Node2D" parent="." node_paths=PackedStringArray("spawnPoint", "targetPoint", "delayLabel")]
+script = ExtResource("1_dvb48")
+spawnPoint = NodePath("../Spawn Point")
+targetPoint = NodePath("../TargetPoint")
+delayLabel = NodePath("../Label")
+speed = 200.0
+subbeat_intervals = [0, 3, 1, 2, 2, 2, 2, 2]
+bpm = 110.0
+
+[node name="Label" type="Label" parent="."]
+offset_right = 40.0
+offset_bottom = 23.0
+
+[node name="TargetPoint" type="Node2D" parent="." node_paths=PackedStringArray("Hitbox", "goodSound", "badSound")]
+position = Vector2(0, 100)
+script = ExtResource("4_0jel4")
+Hitbox = NodePath("Hitbox")
+goodSound = NodePath("GoodSound")
+badSound = NodePath("BadSound")
+
+[node name="ColorRect" type="ColorRect" parent="TargetPoint"]
+anchors_preset = 13
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -25.0
+offset_top = -2.0
+offset_right = 25.0
+offset_bottom = 2.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Hitbox" type="ColorRect" parent="TargetPoint"]
+visible = false
+anchors_preset = 13
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -5.0
+offset_top = -50.0
+offset_right = 5.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Area2D" type="Area2D" parent="TargetPoint"]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TargetPoint/Area2D"]
+shape = SubResource("RectangleShape2D_q1od0")
+
+[node name="BadSound" type="AudioStreamPlayer" parent="TargetPoint"]
+stream = ExtResource("4_hly08")
+volume_db = 2.0
+pitch_scale = 0.5
+
+[node name="GoodSound" type="AudioStreamPlayer" parent="TargetPoint"]
+stream = ExtResource("5_typhi")
+volume_db = -1.0
+
+[node name="Beat Template" parent="." instance=ExtResource("4_0l1si")]
+visible = false
+
+[connection signal="beatConsumed" from="TargetPoint" to="." method="_on_target_point_beat_consumed"]

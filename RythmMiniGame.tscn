@@ -1,0 +1,43 @@
+[gd_scene load_steps=5 format=3 uid="uid://cnddskyqe5nfq"]
+
+[ext_resource type="AudioStream" uid="uid://dqr2iasupdrjb" path="res://Beats/EasyBeat/Easy Beat Song.wav" id="1_0ty45"]
+[ext_resource type="Script" path="res://RythmMiniGame.gd" id="1_ga5rp"]
+[ext_resource type="Script" path="res://StreamTestFile.gd" id="2_d620p"]
+[ext_resource type="PackedScene" uid="uid://dj381yyfj4p2p" path="res://Prefabs/RythmNoteManager.tscn" id="3_blqoh"]
+
+[node name="Node2D" type="Node2D" node_paths=PackedStringArray("ScoreLabel")]
+script = ExtResource("1_ga5rp")
+BeatPointValue = 1000.0
+ScoreLabel = NodePath("Label")
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="." node_paths=PackedStringArray("RythmPath")]
+stream = ExtResource("1_0ty45")
+script = ExtResource("2_d620p")
+RythmPath = NodePath("../Rythm Path")
+
+[node name="Button" type="Button" parent="."]
+offset_right = 159.0
+offset_bottom = 85.0
+text = "Click to play sound"
+
+[node name="Rythm Path" parent="." instance=ExtResource("3_blqoh")]
+position = Vector2(393, 58)
+eventName = &"A is pressed"
+
+[node name="Button2" type="Button" parent="."]
+offset_left = 159.0
+offset_top = 138.0
+offset_right = 240.0
+offset_bottom = 169.0
+text = "Consume"
+
+[node name="Label" type="Label" parent="."]
+offset_left = 241.0
+offset_top = 25.0
+offset_right = 284.0
+offset_bottom = 48.0
+text = "Score"
+
+[connection signal="pressed" from="Button" to="AudioStreamPlayer2D" method="_on_button_pressed"]
+[connection signal="beatConsumed" from="Rythm Path" to="." method="_on_rythm_path_beat_consumed"]
+[connection signal="pressed" from="Button2" to="Rythm Path" method="Consume_on_button_2_pressed"]
